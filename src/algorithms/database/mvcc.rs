@@ -4,12 +4,14 @@ use std::collections::{HashMap, HashSet};
 type Version = u64;
 type Timestamp = u64;
 
+#[derive(Debug)]
 pub struct Transaction {
     start_ts: Timestamp,
     read_set: HashSet<String>,
     write_set: HashMap<String, (Version, String)>,
 }
 
+#[derive(Debug)]
 pub struct MVCC {
     current_ts: Mutex<Timestamp>,
     committed_versions: Mutex<HashMap<String, (Version, String)>>,
@@ -54,7 +56,7 @@ impl MVCC {
         transaction.write_set.insert(key.clone(), (transaction.start_ts, value));
     }
 
-    pub fn commit(&self, transaction: Transaction) -> bool {
+    pub fn commit(&self, transaction: &mut Transaction) -> bool {
         let mut committed_versions = self.committed_versions.lock().unwrap();
         for (key, (version, _)) in &transaction.write_set {
             if let Some(current_version) = committed_versions.get(key) {
@@ -63,8 +65,8 @@ impl MVCC {
                 }
             }
         }
-        for (key, (version, value)) in transaction.write_set {
-            committed_versions.insert(key, (version, value));
+        for (key, (version, value)) in &transaction.write_set {
+            committed_versions.insert(key.to_owned(), (version.to_owned(), value.to_owned()));
         }
         true // Transaction committed successfully
     }

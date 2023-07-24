@@ -1,29 +1,20 @@
-mod algorithms;
-
-use std::sync::Arc;
-use algorithms::database::mvcc::MVCC;
+mod cryptography;
+use cryptography::vignere::{vigenere_decrypt, vigenere_encrypt, generate_key};
 
 fn main() {
-    let mvcc = Arc::new(MVCC::new());
-    let mut transaction = mvcc.begin_transaction();
-    mvcc.write(&mut transaction, "key1".to_owned(), "value1".to_owned());
-    mvcc.write(&mut transaction, "key2".to_owned(), "value2".to_owned());
+    let plaintext = "HELLO";
+    let keyword = "KEY";
+    let key = generate_key(plaintext, keyword);
 
-    let value1 = mvcc.read(&mut transaction, "key1");
-    let value2 = mvcc.read(&mut transaction, "key2");
-
-    let committed = mvcc.commit(transaction);
     
-    if let Some((_, v1)) = value1 {
-        println!("Value of key1: {}", v1);
-    }
-    if let Some((_, v2)) = value2 {
-        println!("Value of key2: {}", v2);
-    }
-
-    if committed {
-        println!("Transaction committed successfully.");
-    } else {
-        println!("Transaction aborted due to conflicts.");
-    }
+    // Encryption
+    let encrypted_text = vigenere_encrypt(plaintext, &key);
+    println!("Encrypted: {}", encrypted_text);
+    
+    // Decryption
+    let decrypted_text = vigenere_decrypt(&encrypted_text, &key);
+    println!("Decrypted: {}", decrypted_text);
+    
+    let xx = generate_key(plaintext, &key);
+    println!("{}", xx);
 }
