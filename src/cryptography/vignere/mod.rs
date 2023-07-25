@@ -21,7 +21,9 @@ pub fn vigenere_encrypt(plaintext: &str, key: &str) -> String {
     let mut new_key = String::new();
 
     for i in 0..plaintext.len() {
-        let x = (plaintext_chars[i] as u8 + key_chars[i] as u8) % 26 + 'A' as u8;
+        let _x = plaintext_chars[i] as u8 + key_chars[i] as u8;
+        let _y = _x % 26;
+        let x = _y + 'A' as u8;
         new_key.push(x as char);
     }
 
